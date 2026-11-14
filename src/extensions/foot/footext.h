@@ -40,4 +40,25 @@ class FootClassExtension : public TechnoClassExtension
          *  The last known flight cell of this object, used by the AircraftTracker.
          */
         Cell LastFlightCell;
+
+        /**
+         *  Is this object currently performing an attack-move order?
+         */
+        bool IsAttackMoving;
+
+        /**
+         *  Has this object stopped its attack-move to fight an enemy?
+         */
+        bool IsAttackMoveEngaged;
+
+        /**
+         *  The destination cell of the current attack-move order.
+         */
+        Cell AttackMoveCell;
+
+        /**
+         *  The location where this object stopped its attack-move to fight.
+         *  Used to stop objects from chasing their target too far away from their path.
+         */
+        Coord AttackMoveEngageCoord;
 };

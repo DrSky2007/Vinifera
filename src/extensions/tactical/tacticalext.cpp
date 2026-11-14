@@ -11,6 +11,8 @@
 
 #include "tacticalext.h"
 
+#include "attackmove.h"
+
 #include "beacon.h"
 #include "colorscheme.h"
 #include "debughandler.h"
@@ -905,6 +907,7 @@ void TacticalExtension::Beacon_Mode_Control(int control)
         Map.IsPowerMode = false;
         Map.IsWaypointMode = false;
         Map.IsRepairMode = false;
+        AttackMoveClass::Clear_Mode();
         Map.Set_Default_Mouse(MOUSE_NORMAL, false);
         if (mode) {
             IsBeaconPlacementMode = true;

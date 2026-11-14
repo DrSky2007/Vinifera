@@ -12,6 +12,7 @@
 #include "displayext_hooks.h"
 
 #include "actiontype.h"
+#include "attackmove.h"
 #include "building.h"
 #include "buildingtypeext.h"
 #include "cell.h"
@@ -422,9 +423,19 @@ DEFINE_HOOK(0x0047A856, _DisplayClass_47A790_Patch, 0)
 DEFINE_HOOK(0x00478BC7, _Display_Class_Mouse_Left_Release_Toggle_Select_Patch, 5)
 {
     GET(ActionType, action, EDI);
+    GET_STACK(Cell *, cell, 0x54);
 
     if (action == ACTION_TOGGLE_SELECT) {
         return 0x00478BD8;
+    }
+
+    /**
+     *  Gives the attack-move order to the selected objects.
+     *  This must not go through the regular order code below.
+     */
+    if (action == EXT_ACTION_ATTACK_MOVE) {
+        AttackMoveClass::Issue_Order(*cell);
+        return 0x00479138;
     }
 
     return 0;

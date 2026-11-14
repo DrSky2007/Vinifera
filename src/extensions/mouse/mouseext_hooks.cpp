@@ -12,6 +12,7 @@
 #include "mouseext_hooks.h"
 
 #include "asserthandler.h"
+#include "attackmove.h"
 #include "cell.h"
 #include "extension.h"
 #include "hooker.h"
@@ -342,7 +343,19 @@ DEFINE_HOOK(0x005E8920, _ScrollClass_What_Action_Attack_Cursor_Patch, 0)
     GET_STACK(ObjectClass*, obj, 0x1C);
     GET_STACK(bool, check_fog, 0x20);
 
-    ActionType action = Get_Action(obj, *cellnum, check_fog);
+    ActionType action;
+
+    /**
+     *  While picking an attack-move destination, every location is a valid target.
+     */
+    if (AttackMoveClass::Is_Mode_Active() && AttackMoveClass::Is_Selection_Able()) {
+        action = static_cast<ActionType>(EXT_ACTION_ATTACK_MOVE);
+    } else {
+        if (AttackMoveClass::Is_Mode_Active()) {
+            AttackMoveClass::Clear_Mode();
+        }
+        action = Get_Action(obj, *cellnum, check_fog);
+    }
 
     // return action;
     R->EAX(action);

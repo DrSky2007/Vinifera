@@ -348,6 +348,14 @@ Vinifera modifies the vanilla "Deploy" keyboard command to work with air transpo
 
 ![image](https://user-images.githubusercontent.com/73803386/123566309-4ade4600-d7b7-11eb-9b77-5c9de7959822.png)
 
+### `[ ]` Attack Move
+
+- Enters attack-move mode for the selected units. The next left-click on the map orders them to move to that location, like a regular move order, but they stop to fight any enemy that comes into weapon range on the way. Once the enemy is defeated, they continue moving to their destination.
+- Units only chase their target up to a short distance away from the point where they left their path (their sight range or weapon range, whichever is larger, plus 2 cells), then they give up and continue moving.
+- Unarmed units and aircraft in the selection perform a regular move order instead.
+- Hold the Select key (Shift by default) while clicking to stay in attack-move mode and give multiple orders. Right-click cancels attack-move mode.
+- Attack-move uses the `AttackMove` action, which can be customized like other actions. By default, it uses the attack waypoint cursor.
+
 ### Customizable Vanilla Modifier Keys
 
 - Vinifera allows the player to customize the keys used for Force Move, Force Attack, Select and Queued Move.
@@ -362,6 +370,22 @@ ForceMove=18    ; key number, ALT
 ForceAttack=17  ; key number, CONTROL
 Select=16       ; key number, SHIFT
 QueueMove=81    ; key number, Q if the new sidebar is off, otherwise Z
+```
+
+## Right-Click Orders
+
+- Vinifera adds an optional "modern" mouse control scheme, similar to more recent RTS games (and OpenRA's default controls):
+  - Left-click selects. Left-clicking on an empty location (or on a location where the selected units would perform an order) unselects all units, while left-clicking on another object selects it instead.
+  - Right-click gives the order to the selected units (move, attack, enter, deploy, capture, etc.). Right-clicking when no unit is selected does nothing.
+  - Holding the right mouse button and dragging still scrolls the map.
+  - Band box selection, Shift-click to add to the selection, and the Force Move/Force Attack modifier keys work as usual (combined with right-click for the orders).
+  - Special modes (sell, repair, power, waypoints, beacons, super weapon targeting, attack-move) still use left-click to confirm and right-click to cancel.
+  - The radar is not affected: left-clicking on the radar still gives the order to the selected units, like in the original game. Right-clicking on the radar does nothing.
+
+In `SUN.INI`:
+```ini
+[Options]
+RightClickOrders=no  ; boolean, should the "modern" control scheme (left-click selects, right-click gives orders) be used?
 ```
 
 ## Dropship Loadout

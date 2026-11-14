@@ -44,6 +44,7 @@ public:
     void Do_IDLE();
     void Do_TIMING();
     void Do_REMOVEPLAYER();
+    void Do_ATTACK_MOVE();
 
     static const char* Event_Name(EventType event) { return event >= EVENT_EMPTY && event < EXT_EVENT_COUNT ? EventNames[event] : ""; }
     static unsigned char Event_Length(EventType event) { return event >= EVENT_EMPTY && event < EXT_EVENT_COUNT ? EventLength[event] : 0; }

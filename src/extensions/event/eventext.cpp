@@ -11,8 +11,10 @@
 
 #include "eventext.h"
 
+#include "attackmove.h"
 #include "debughandler.h"
 #include "extension.h"
+#include "foot.h"
 #include "houseext.h"
 #include "mouse.h"
 #include "protocolzero.h"
@@ -21,6 +23,8 @@
 #include "spawnmanager.h"
 #include "unit.h"
 #include "vinifera_globals.h"
+
+#include <cstring>
 
 
 /***************************************************************************
@@ -65,7 +69,8 @@ unsigned char EventClassExt::EventLength[EXT_EVENT_COUNT] = {
     sizeof(EventClass::Data.General),           // REMOVEPLAYER
     sizeof(EventClass::Data.General),           // LATENCYFUDGE
     sizeof(EventClassExt::Data.PlayerOptions),  // PLAYER_OPTIONS
-    sizeof(EventClassExt::Data.ResponseTime2)   // RESPONSE_TIME2
+    sizeof(EventClassExt::Data.ResponseTime2),  // RESPONSE_TIME2
+    sizeof(EventClassExt::Data.NavCom)          // ATTACK_MOVE
 };
 
 
@@ -108,6 +113,7 @@ char const* EventClassExt::EventNames[EXT_EVENT_COUNT] = {
     "LATENCYFUDGE",
     "PLAYER_OPTIONS",
     "RESPONSE_TIME_2",
+    "ATTACK_MOVE",
 };
 
 
@@ -368,6 +374,14 @@ void EventClassExt::Execute()
     case EXT_EVENT_RESPONSE_TIME2:
         ProtocolZero::Handle_Response_Time(*this);
         break;
+
+        /*
+        **  Gives a move order to an object (exactly like MEGAMISSION does)
+        **  and flags it as attack-moving.
+        */
+    case EXT_EVENT_ATTACK_MOVE:
+        Do_ATTACK_MOVE();
+        break;
     }
 }
 
@@ -398,6 +412,11 @@ void EventClassExt::Do_IDLE()
             foot->field_228 = Cell(0, 0);
         }
 
+        /**
+         *  Stopping cancels any attack-move order.
+         */
+        AttackMoveClass::Cancel(techno);
+
         techno->Transmit_Message(RADIO_OVER_OUT);
         techno->Assign_Destination(nullptr);
         techno->Assign_Target(nullptr);
@@ -414,6 +433,61 @@ void EventClassExt::Do_IDLE()
             }
         }
     }
+}
+
+
+/**
+ *  Executes the ATTACK_MOVE event.
+ *
+ *  This event replaces the regular move order (MEGAMISSION) event of an object,
+ *  so first the regular move order is performed, then the object is flagged as
+ *  attack-moving.
+ *
+ *  @author: Vinifera contributors
+ */
+void EventClassExt::Do_ATTACK_MOVE()
+{
+    TechnoClass* techno = Data.NavCom.Whom.As_Techno();
+
+    if (techno == nullptr || !techno->IsActive || techno->IsInLimbo) {
+        return;
+    }
+
+    /**
+     *  Perform the regular move order, exactly like the original MEGAMISSION event
+     *  (this also validates that the sender is allowed to control this object).
+     */
+    EventClass move_event = As_Event();
+    move_event.Type = EVENT_MEGAMISSION;
+    std::memset(&move_event.Data, 0, sizeof(move_event.Data));
+    move_event.Data.MegaMission.Whom = Data.NavCom.Whom;
+    move_event.Data.MegaMission.Mission = MISSION_MOVE;
+    move_event.Data.MegaMission.Target.Invalidate();
+    move_event.Data.MegaMission.Destination = Data.NavCom.Where;
+    move_event.Execute();
+
+    /**
+     *  Make sure the sender is allowed to control this object
+     *  (same rules as for the MEGAMISSION event).
+     */
+    if (!techno->IsActive || techno->IsInLimbo) {
+        return;
+    }
+
+    if (Session.Type != GAME_NORMAL) {
+        if (ID != static_cast<unsigned>(techno->House->HeapID)) {
+            DEBUG_WARNING("Ignoring event {} for an object not owned by house ID {}.\n", Event_Name(Type), ID);
+            return;
+        }
+    } else if (!techno->House->IsPlayerControl) {
+        return;
+    }
+
+    if (!AttackMoveClass::Can_Attack_Move(techno)) {
+        return;
+    }
+
+    AttackMoveClass::Start(static_cast<FootClass*>(techno));
 }
 
 

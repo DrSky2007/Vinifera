@@ -81,6 +81,11 @@ public:
     bool FilterBandBoxSelection;
 
     /**
+     *  Use the "modern" mouse control scheme? (left-click selects, right-click issues orders).
+     */
+    bool IsRightClickOrders;
+
+    /**
      *  User override for the battle sidebar view type. SIDEBAR_COUNT means use UI.INI.
      */
     SidebarViewType SidebarViewTypeOverride;

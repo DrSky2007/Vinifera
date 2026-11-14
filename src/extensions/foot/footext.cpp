@@ -19,7 +19,11 @@
  */
 FootClassExtension::FootClassExtension(const FootClass *this_ptr) :
     TechnoClassExtension(this_ptr),
-    LastFlightCell(CELL_NONE)
+    LastFlightCell(CELL_NONE),
+    IsAttackMoving(false),
+    IsAttackMoveEngaged(false),
+    AttackMoveCell(CELL_NONE),
+    AttackMoveEngageCoord(COORD_NONE)
 {
 }
 
@@ -87,6 +91,10 @@ HRESULT FootClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 void FootClassExtension::Object_CRC(CRCEngine &crc) const
 {
     TechnoClassExtension::Object_CRC(crc);
+
+    crc(IsAttackMoving);
+    crc(IsAttackMoveEngaged);
+    crc(AttackMoveCell.As_Cell_Number());
 }
 
 

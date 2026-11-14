@@ -11,6 +11,8 @@
 
 #include "footext_hooks.h"
 
+#include "attackmove.h"
+
 #include "aircrafttracker.h"
 #include "asserthandler.h"
 #include "clipline.h"
@@ -472,6 +474,59 @@ Cell FootClassExt::_Search_For_Tiberium(int rad, bool a2)
 
 
 /**
+ *  Attack-move: makes attack-moving objects stop and fight enemies that come
+ *  into weapon range while they are moving.
+ *
+ *  This patches FootClass::Mission_Move before the original passive target
+ *  acquisition (which only applies to computer players).
+ *
+ *  @author: Vinifera contributors
+ */
+DEFINE_HOOK(0x004A1002, _FootClass_Mission_Move_Attack_Move_Patch, 6)
+{
+    GET(FootClass *, this_ptr, ESI);
+
+    if (AttackMoveClass::Mission_Move_AI(this_ptr)) {
+        goto finish_mission_process;
+    }
+
+    /**
+     *  Execute the stolen bytes and continue with the original passive target acquisition.
+     */
+    return 0;
+
+finish_mission_process:
+    return 0x004A104B;
+}
+
+
+/**
+ *  Attack-move: makes attack-moving objects continue to their destination
+ *  once their target has been defeated.
+ *
+ *  This patches the start of FootClass::Mission_Attack (also used by units and infantry).
+ *
+ *  @author: Vinifera contributors
+ */
+DEFINE_HOOK(0x004A1A33, _FootClass_Mission_Attack_Attack_Move_Patch, 6)
+{
+    GET(FootClass *, this_ptr, ESI);
+
+    if (AttackMoveClass::Mission_Attack_AI(this_ptr)) {
+        goto finish_mission_process;
+    }
+
+    /**
+     *  Execute the stolen bytes and continue with the original attack mission logic.
+     */
+    return 0;
+
+finish_mission_process:
+    return 0x004A1A55;
+}
+
+
+/**
  *  #issue-593
  * 
  *  Implements IsCanPassiveAcquire for TechnoTypes when the unit is in MISSION_MOVE.
@@ -511,6 +566,11 @@ finish_mission_process:
 DEFINE_HOOK(0x004A1AAE, _FootClass_Mission_Guard_Can_Passive_Acquire_Patch, 0)
 {
     GET(FootClass *, this_ptr, ESI);
+
+    /**
+     *  Continue or complete an attack-move order, now that the object has nothing to do.
+     */
+    AttackMoveClass::Mission_Guard_AI(this_ptr);
 
     auto technoclassext = Extension::Fetch(this_ptr);
 

@@ -11,6 +11,7 @@
 
 #include "beacon_hooks.h"
 
+#include "attackmove.h"
 #include "beacon.h"
 #include "building.h"
 #include "extension.h"
@@ -20,6 +21,7 @@
 #include "mouse.h"
 #include "radar.h"
 #include "radarevent.h"
+#include "scrollext_hooks.h"
 #include "syringe.h"
 #include "tacticalext.h"
 #include "tibsun_functions.h"
@@ -119,6 +121,7 @@ void DisplayClassExt::_Sell_Mode_Control(int control)
         IsPowerMode = false;
         IsWaypointMode = false;
         TacticalMapExtension->IsBeaconPlacementMode = false;
+        AttackMoveClass::Clear_Mode();
         if (mode && PlayerPtr->CurBuildings > 0) {
             IsSellMode = true;
             Unselect_All();
@@ -159,6 +162,7 @@ void DisplayClassExt::_Power_Mode_Control(int control)
         IsSellMode = false;
         IsWaypointMode = false;
         TacticalMapExtension->IsBeaconPlacementMode = false;
+        AttackMoveClass::Clear_Mode();
         if (mode && PlayerPtr->CurBuildings > 0) {
             IsPowerMode = true;
             Unselect_All();
@@ -198,6 +202,7 @@ void DisplayClassExt::_Repair_Mode_Control(int control)
         IsPowerMode = false;
         IsWaypointMode = false;
         TacticalMapExtension->IsBeaconPlacementMode = false;
+        AttackMoveClass::Clear_Mode();
         Set_Default_Mouse(MOUSE_NORMAL, false);
         if (mode && PlayerPtr->CurBuildings > 0) {
             IsRepairMode = true;
@@ -213,11 +218,18 @@ void DisplayClassExt::_Repair_Mode_Control(int control)
 /**
  *  Replacement for DisplayClass::Mouse_Right_Release.
  *  Disables beacon placement mode on RMB.
+ *  Disables attack-move mode on RMB.
+ *  Issues orders on RMB if the right-click orders control scheme is enabled.
  *
  *  @author: ZivDero, tomsons26
  */
 void DisplayClassExt::_Mouse_Right_Release(Point2D const& point)
 {
+    /**
+     *  Is this a right-click on the tactical map (as opposed to the radar)?
+     */
+    bool on_tactical_map = ScrollClassExtension_Take_Tactical_Right_Release();
+
     if (PendingObjectPtr && PendingObjectPtr->Is_Techno()) {
         PendingObjectPtr = nullptr;
         PendingObject = nullptr;
@@ -241,7 +253,9 @@ void DisplayClassExt::_Mouse_Right_Release(Point2D const& point)
                         } else {
                             if (TacticalMapExtension->IsBeaconPlacementMode) {
                                 TacticalMapExtension->Beacon_Mode_Control(0);
-                            } else {
+                            } else if (AttackMoveClass::Is_Mode_Active()) {
+                                AttackMoveClass::Mode_Control(0);
+                            } else if (!ScrollClassExtension_Right_Click_Order(point, on_tactical_map)) {
                                 Unselect_All();
                             }
                         }
@@ -263,6 +277,7 @@ void DisplayClassExt::_Mouse_Right_Release(Point2D const& point)
 DEFINE_HOOK(0x004795CF, _DisplayClass_Waypoint_Mode_Control_BeaconMode_Patch, 7)
 {
     TacticalMapExtension->IsBeaconPlacementMode = false;
+    AttackMoveClass::Clear_Mode();
 
     return 0;
 }

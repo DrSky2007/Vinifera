@@ -11,6 +11,7 @@
 
 #include "eventext_hooks.h"
 
+#include "attackmove.h"
 #include "connmgr.h"
 #include "debughandler.h"
 #include "desyncdialog.h"
@@ -883,6 +884,10 @@ DEFINE_HOOK(0x004946FF, _EventClass_Execute_MEGAMISSION_Prevent_Controlling_Enem
             }
         }
     }
+
+    // Any new order cancels an attack-move order. The ATTACK_MOVE event also
+    // performs its move order through here, and flags the object again afterwards.
+    AttackMoveClass::Cancel(techno);
 
     // Continue event execution.
     return Continue;

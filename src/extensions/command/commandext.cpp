@@ -11,6 +11,8 @@
 
 #include "commandext.h"
 
+#include "attackmove.h"
+
 #include "aircraft.h"
 #include "aircrafttype.h"
 #include "anim.h"
@@ -2422,6 +2424,42 @@ bool BeaconPlacementCommandClass::Process()
         if (!PlayerPtr->IsDefeated) {
             TacticalMapExtension->Beacon_Mode_Control(-1);
         }
+    }
+
+    return true;
+}
+
+
+/**
+ *  Enters attack-move mode for the selected objects. The next click on the
+ *  map orders them to move there, fighting any enemies they meet on the way.
+ *
+ *  @author: Vinifera contributors
+ */
+const char* AttackMoveCommandClass::Get_Name() const
+{
+    return "AttackMove";
+}
+
+const char* AttackMoveCommandClass::Get_UI_Name() const
+{
+    return "Attack Move";
+}
+
+const char* AttackMoveCommandClass::Get_Category() const
+{
+    return Text_String(TXT_CONTROL);
+}
+
+const char* AttackMoveCommandClass::Get_Description() const
+{
+    return "Orders the selected units to move to a location, attacking any enemies they encounter on the way.";
+}
+
+bool AttackMoveCommandClass::Process()
+{
+    if (!PlayerPtr->IsDefeated) {
+        AttackMoveClass::Mode_Control(-1);
     }
 
     return true;

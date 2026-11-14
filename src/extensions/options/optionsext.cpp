@@ -143,6 +143,7 @@ OptionsClassExtension::OptionsClassExtension(const OptionsClass *this_ptr) :
     GlobalExtensionClass(this_ptr),
     SortDefensesAsLast(true),
     FilterBandBoxSelection(true),
+    IsRightClickOrders(false),
     SidebarViewTypeOverride(SIDEBAR_COUNT),
     KeyChatToAll1(KN_RETURN),
     KeyChatToAll2(KN_F8),
@@ -249,6 +250,7 @@ void OptionsClassExtension::Load_Settings()
 {
     SortDefensesAsLast = ConfigINI.Get_Bool("Options", "SortDefensesAsLast", SortDefensesAsLast);
     FilterBandBoxSelection = ConfigINI.Get_Bool("Options", "FilterBandBoxSelection", FilterBandBoxSelection);
+    IsRightClickOrders = ConfigINI.Get_Bool("Options", "RightClickOrders", IsRightClickOrders);
     IsPauseRepairs = ConfigINI.Get_Bool("Options", "PauseRepairs", IsPauseRepairs);
 
     SidebarViewTypeOverride = SIDEBAR_COUNT;
