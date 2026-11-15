@@ -353,7 +353,7 @@ Vinifera modifies the vanilla "Deploy" keyboard command to work with air transpo
 - Enters attack-move mode for the selected units. The next left-click on the map orders them to move to that location, like a regular move order, but they stop to fight any enemy that comes into weapon range on the way. Once the enemy is defeated, they continue moving to their destination.
 - Units only chase their target up to a short distance away from the point where they left their path (their sight range or weapon range, whichever is larger, plus 2 cells), then they give up and continue moving.
 - Unarmed units and aircraft in the selection perform a regular move order instead.
-- Hold the Select key (Shift by default) while clicking to stay in attack-move mode and give multiple orders. Right-click cancels attack-move mode.
+- Hold the Select key (Shift by default) while clicking to stay in attack-move mode and give multiple orders. Pressing the Attack Move key again cancels attack-move mode, as does right-click (unless the right-click orders control scheme is enabled, in which case right-click gives the attack-move order as well).
 - Attack-move uses the `AttackMove` action, which can be customized like other actions. By default, it uses the attack waypoint cursor.
 
 ### Customizable Vanilla Modifier Keys
@@ -379,8 +379,9 @@ QueueMove=81    ; key number, Q if the new sidebar is off, otherwise Z
   - Right-click gives the order to the selected units (move, attack, enter, deploy, capture, etc.). Right-clicking when no unit is selected does nothing.
   - Holding the right mouse button and dragging still scrolls the map.
   - Band box selection, Shift-click to add to the selection, and the Force Move/Force Attack modifier keys work as usual (combined with right-click for the orders).
-  - Special modes (sell, repair, power, waypoints, beacons, super weapon targeting, attack-move) still use left-click to confirm and right-click to cancel.
-  - The radar is not affected: left-clicking on the radar still gives the order to the selected units, like in the original game. Right-clicking on the radar does nothing.
+  - Special modes (sell, repair, power, waypoints, beacons, super weapon targeting) still use left-click to confirm and right-click to cancel.
+  - In attack-move mode, both left-click and right-click give the attack-move order. Use the Attack Move key again to cancel attack-move mode.
+  - On the radar, left-click always moves the view to the clicked location (even when units are selected), while right-click gives the order (or the attack-move order) to the selected units at that location.
 
 In `SUN.INI`:
 ```ini

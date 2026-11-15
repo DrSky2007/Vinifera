@@ -11,10 +11,13 @@
 
 #include "scrollext_hooks.h"
 
+#include "attackmove.h"
 #include "building.h"
+#include "cell.h"
 #include "extension_globals.h"
 #include "hooker.h"
 #include "house.h"
+#include "map.h"
 #include "mouse.h"
 #include "objecttype.h"
 #include "options.h"
@@ -27,6 +30,7 @@
 #include "tibsun_functions.h"
 #include "tibsun_globals.h"
 #include "tspp.h"
+#include "vinifera_defines.h"
 #include "windialog.h"
 #include "wwkeyboard.h"
 
@@ -184,10 +188,11 @@ bool ScrollClassExtension_Right_Click_Order(const Point2D& xy, bool on_tactical_
      *  Only actual orders are performed on right-click. Things like selecting
      *  another object are left to the left mouse button.
      */
-    if (Is_Unit_Order_Action(action)) {
+    if (Is_Unit_Order_Action(action) || action == EXT_ACTION_ATTACK_MOVE) {
 
         /**
          *  The original handler passes the coordinate under the mouse as the first argument.
+         *  This also gives the attack-move order while in attack-move mode.
          */
         Map.DisplayClass::Mouse_Left_Release(reinterpret_cast<Point2D&>(coord), cell, object, action, false);
     }
@@ -356,6 +361,91 @@ DEFINE_HOOK(0x005E95D2, _ScrollClass_Message_Handler_Right_Release_Point_Patch, 
 
     /**
      *  Execute the stolen bytes and continue to DisplayClass::Mouse_Right_Release.
+     */
+    return 0;
+}
+
+
+/**
+ *  Right-click orders control scheme for the radar (minimap):
+ *  - Left-click always moves the tactical view to the clicked location,
+ *    even if objects are selected (it never gives orders).
+ *  - Right-click gives the order (or the attack-move order) to the selected
+ *    objects at the clicked location.
+ *
+ *  This patches RadarClass::RTacticalClass::Action right after the action of
+ *  the selected objects for the location under the mouse has been computed.
+ *
+ *  @author: Vinifera contributors
+ */
+DEFINE_HOOK(0x005B932D, _RadarClass_RTacticalClass_Action_Right_Click_Orders_Patch, 5)
+{
+    enum {
+        LEFTPRESS = 0x01,
+        LEFTRELEASE = 0x04,
+        LEFTUP = 0x08,
+        RIGHTRELEASE = 0x40
+    };
+
+    GET(ActionType, action, EAX);
+    LEA_STACK(Cell *, cell, 0x0C);
+    GET_STACK(ObjectClass *, object, 0x10);
+    GET_STACK(bool, shadow, 0x14);
+    REF_STACK(unsigned, flags, 0x48);
+
+    if (!OptionsExtension->IsRightClickOrders) {
+        return 0;
+    }
+
+    bool is_attack_move = AttackMoveClass::Is_Mode_Active() && AttackMoveClass::Is_Selection_Able();
+
+    /**
+     *  Right-click: give the order.
+     */
+    if (flags & RIGHTRELEASE) {
+
+        if (is_attack_move) {
+            AttackMoveClass::Issue_Order(*cell);
+
+        } else if (Is_Unit_Order_Action(action)) {
+            Coord coord = Map[*cell].Center_Coord();
+            Map.DisplayClass::Mouse_Left_Release(reinterpret_cast<Point2D &>(coord), *cell, object, action, true);
+            TechnoClass::Reset_Action_Line_Timer();
+        }
+
+        /**
+         *  Don't let the original code unselect everything.
+         */
+        flags &= ~RIGHTRELEASE;
+    }
+
+    /**
+     *  Left-click: move the tactical view to the clicked location.
+     *  The original code for this expects the cell in the same place, and EBX to be 0.
+     */
+    if (flags & LEFTPRESS) {
+        return 0x005B9357;
+    }
+
+    /**
+     *  Left-clicks never give orders.
+     */
+    flags &= ~LEFTRELEASE;
+
+    /**
+     *  Show the attack-move cursor while in attack-move mode
+     *  (the original code would show the regular order cursor).
+     */
+    if (is_attack_move) {
+        if (flags & LEFTUP) {
+            Map.DisplayClass::Mouse_Left_Up(*cell, shadow, object, static_cast<ActionType>(EXT_ACTION_ATTACK_MOVE), true);
+        }
+        return 0x005B948A;
+    }
+
+    /**
+     *  Execute the stolen bytes and continue with the original code
+     *  (which shows the order cursor for the location under the mouse).
      */
     return 0;
 }

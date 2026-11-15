@@ -254,7 +254,14 @@ void DisplayClassExt::_Mouse_Right_Release(Point2D const& point)
                             if (TacticalMapExtension->IsBeaconPlacementMode) {
                                 TacticalMapExtension->Beacon_Mode_Control(0);
                             } else if (AttackMoveClass::Is_Mode_Active()) {
-                                AttackMoveClass::Mode_Control(0);
+
+                                /**
+                                 *  With right-click orders, right-click gives the attack-move order.
+                                 *  Otherwise (or if nothing is selected anymore), cancel attack-move mode.
+                                 */
+                                if (!ScrollClassExtension_Right_Click_Order(point, on_tactical_map)) {
+                                    AttackMoveClass::Mode_Control(0);
+                                }
                             } else if (!ScrollClassExtension_Right_Click_Order(point, on_tactical_map)) {
                                 Unselect_All();
                             }
