@@ -2431,6 +2431,98 @@ bool BeaconPlacementCommandClass::Process()
 
 
 /**
+ *  Shows a short message on the tactical view.
+ */
+static void Show_Cheat_Message(const char* text)
+{
+    Session.Messages.Add_Message(nullptr, 0, text, Fetch_Scheme_Index_By_Name("White"), TPF_6PT_GRAD | TPF_USE_GRAD_PAL | TPF_FULLSHADOW, Rule->MessageDelay * TICKS_PER_MINUTE);
+    Map.Flag_To_Redraw(2);
+}
+
+
+/**
+ *  Gives 1,000 credits to the player.
+ *
+ *  Only available in single player games (campaign and skirmish), as it
+ *  directly changes the game state without going through a network event.
+ *
+ *  @author: Vinifera contributors
+ */
+const char* GiveCreditsCommandClass::Get_Name() const
+{
+    return "GiveCredits";
+}
+
+const char* GiveCreditsCommandClass::Get_UI_Name() const
+{
+    return "Cheat: +1000 Credits";
+}
+
+const char* GiveCreditsCommandClass::Get_Category() const
+{
+    return "Cheats";
+}
+
+const char* GiveCreditsCommandClass::Get_Description() const
+{
+    return "Gives 1,000 credits to the player (single player only).";
+}
+
+bool GiveCreditsCommandClass::Process()
+{
+    if (Session.Players.Count() > 1 || PlayerPtr == nullptr || PlayerPtr->IsDefeated) {
+        return false;
+    }
+
+    PlayerPtr->Refund_Money(1000);
+
+    return true;
+}
+
+
+/**
+ *  Toggles instant building of units and structures for the player.
+ *
+ *  Only available in single player games (campaign and skirmish), as it
+ *  directly changes the game state without going through a network event.
+ *
+ *  @author: Vinifera contributors
+ */
+const char* ToggleInstantBuildCommandClass::Get_Name() const
+{
+    return "ToggleInstantBuild";
+}
+
+const char* ToggleInstantBuildCommandClass::Get_UI_Name() const
+{
+    return "Cheat: Instant Build";
+}
+
+const char* ToggleInstantBuildCommandClass::Get_Category() const
+{
+    return "Cheats";
+}
+
+const char* ToggleInstantBuildCommandClass::Get_Description() const
+{
+    return "Toggles instant building of units and structures for the player (single player only).";
+}
+
+bool ToggleInstantBuildCommandClass::Process()
+{
+    if (Session.Players.Count() > 1) {
+        return false;
+    }
+
+    Vinifera_Developer_InstantBuild = !Vinifera_Developer_InstantBuild;
+
+    Show_Cheat_Message(Vinifera_Developer_InstantBuild ? "Instant Build: ON" : "Instant Build: OFF");
+
+    return true;
+}
+
+
+/**
  *  Enters attack-move mode for the selected objects. The next click on the
  *  map orders them to move there, fighting any enemies they meet on the way.
  *

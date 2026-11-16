@@ -294,6 +294,8 @@ void Init_Vinifera_Commands()
     Commands.Add(new HealthFilterAddNextCommandClass);
     Commands.Add(new BeaconPlacementCommandClass);
     Commands.Add(new AttackMoveCommandClass);
+    Commands.Add(new GiveCreditsCommandClass);
+    Commands.Add(new ToggleInstantBuildCommandClass);
     Commands.Add(new ToggleDebugOverlayCommandClass);
 
 #ifndef NDEBUG

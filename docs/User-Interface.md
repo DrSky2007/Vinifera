@@ -348,6 +348,14 @@ Vinifera modifies the vanilla "Deploy" keyboard command to work with air transpo
 
 ![image](https://user-images.githubusercontent.com/73803386/123566309-4ade4600-d7b7-11eb-9b77-5c9de7959822.png)
 
+### `[ ]` Cheat: +1000 Credits
+
+- Gives 1,000 credits to the player. Only works in single player games (campaign and skirmish).
+
+### `[ ]` Cheat: Instant Build
+
+- Toggles instant building of units and structures for the player. Only works in single player games (campaign and skirmish).
+
 ### `[ ]` Attack Move
 
 - Enters attack-move mode for the selected units. The next left-click on the map orders them to move to that location, like a regular move order, but they stop to fight any enemy that comes into weapon range on the way. Once the enemy is defeated, they continue moving to their destination.

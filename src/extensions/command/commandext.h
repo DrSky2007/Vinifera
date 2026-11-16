@@ -695,6 +695,34 @@ public:
 
 
 /**
+ *  Gives 1,000 credits to the player (single player games only).
+ */
+class GiveCreditsCommandClass : public ViniferaCommandClass
+{
+public:
+    virtual const char* Get_Name() const override;
+    virtual const char* Get_UI_Name() const override;
+    virtual const char* Get_Category() const override;
+    virtual const char* Get_Description() const override;
+    virtual bool Process() override;
+};
+
+
+/**
+ *  Toggles instant building for the player (single player games only).
+ */
+class ToggleInstantBuildCommandClass : public ViniferaCommandClass
+{
+public:
+    virtual const char* Get_Name() const override;
+    virtual const char* Get_UI_Name() const override;
+    virtual const char* Get_Category() const override;
+    virtual const char* Get_Description() const override;
+    virtual bool Process() override;
+};
+
+
+/**
  *  Enters attack-move mode for the selected objects.
  */
 class AttackMoveCommandClass : public ViniferaCommandClass
