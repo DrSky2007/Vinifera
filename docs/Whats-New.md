@@ -59,6 +59,7 @@ This page lists the history of changes across stable Vinifera releases and also 
 
 New:
 - Add an optional "modern" mouse control scheme where left-click selects and right-click gives orders, enabled with `[Options]->RightClickOrders` in `SUN.INI`
+- Aircraft docked at a helipad are now also repaired (`[General]->HelipadRepair`)
 - Add the Attack Move keyboard command, which orders units to move to a location while fighting any enemies they encounter on the way
 - Screenshots now display an on-screen confirmation with the saved filename, or an error message if the screenshot could not be written (by ZivDero)
 - Introduce -4 as a possible argument meaning "any human player" for the "Entered By" event (by Rampastring)

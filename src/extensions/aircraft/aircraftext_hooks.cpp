@@ -24,6 +24,8 @@
 #include "mouse.h"
 #include "object.h"
 #include "rules.h"
+#include "rulesext.h"
+#include "extension_globals.h"
 #include "syringe.h"
 #include "tibsun_globals.h"
 #include "team.h"
@@ -306,6 +308,30 @@ ActionType AircraftClassExt::_What_Action(ObjectClass const* target, bool disall
 
 
 /**
+ *  Is this aircraft sitting on the helipad "from" and should it be repaired there?
+ *
+ *  @author: Vinifera contributors
+ */
+static bool Is_Docked_For_Helipad_Repair(AircraftClass* aircraft, RadioClass* from)
+{
+    if (!RuleExtension->IsHelipadRepair) {
+        return false;
+    }
+
+    if (from == nullptr || from->RTTI != RTTI_BUILDING) {
+        return false;
+    }
+
+    BuildingClass* building = static_cast<BuildingClass*>(from);
+    if (!building->Class->IsHelipad) {
+        return false;
+    }
+
+    return aircraft->HeightAGL == 0 && aircraft->Contact_With_Whom() == from;
+}
+
+
+/**
  *  AircraftClass::Receive_Message replacement.
  *
  *  @author: ZivDero
@@ -320,10 +346,40 @@ RadioMessageType AircraftClassExt::_Receive_Message(RadioClass* from, RadioMessa
         if (Ammo >= Class->MaxAmmo / 2 && TarCom != nullptr) {
             return RADIO_ROGER;
         }
+
+        /**
+         *  Helipad repair: while docked, the helipad also repairs the aircraft.
+         *  Reload one step of ammo (if needed) and repair one step (if needed).
+         */
+        if (Is_Docked_For_Helipad_Repair(this, from)) {
+            RadioMessageType reload = FootClass::Receive_Message(from, RADIO_RELOAD, param);
+
+            RadioMessageType repair = RADIO_NEGATIVE;
+            if (Strength < static_cast<int>(Class->MaxStrength)) {
+                repair = TechnoClass::Receive_Message(from, RADIO_REPAIR, param); // FootClass refuses while it has a NavCom.
+            }
+
+            /**
+             *  Keep the aircraft docked as long as something is being done.
+             */
+            if (reload == RADIO_ROGER || repair == RADIO_ROGER || repair == RADIO_ALL_DONE) {
+                return RADIO_ROGER;
+            }
+            return RADIO_NEGATIVE;
+        }
+
         return FootClass::Receive_Message(from, message, param);
 
     case RADIO_PREPARED:
         if (TarCom != nullptr) return RADIO_NEGATIVE;
+
+        /**
+         *  Helipad repair: a damaged aircraft sitting on a helipad isn't done yet.
+         */
+        if (Is_Docked_For_Helipad_Repair(this, from) && Strength < static_cast<int>(Class->MaxStrength)) {
+            return RADIO_NEGATIVE;
+        }
+
         if ((HeightAGL == 0 && Ammo == Class->MaxAmmo) || (HeightAGL > 0 && Ammo > 0)) return RADIO_ROGER;
         return RADIO_NEGATIVE;
 

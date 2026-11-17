@@ -110,6 +110,11 @@ public:
     bool IsRecheckPrerequisites;
 
     /**
+     *  Should aircraft docked at a helipad also be repaired (like at a service depot)?
+     */
+    bool IsHelipadRepair;
+
+    /**
      *  Should the game assume there is more than one MCV (that factions don't share their MCV?)
      */
     bool IsMultiMCV;

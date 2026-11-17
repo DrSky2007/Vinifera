@@ -24,6 +24,16 @@ In `RULES.INI`:
 ReloadRate=     ; float, the rate that this aircraft will reload its ammo when docked with a helipad. Defaults to [General]->ReloadRate.
 ```
 
+### Helipad Repair
+
+- Aircraft docked at a helipad are now also repaired, in addition to having their ammo reloaded. Repairs cost money just like at a service depot. Once the ammo is full, the remaining repair runs at the service depot repair rate (`[General]->URepairRate`).
+
+In `RULES.INI`:
+```ini
+[General]
+HelipadRepair=yes  ; boolean, should aircraft docked at a helipad also be repaired?
+```
+
 ## Animations
 
 ### Additional Animation Spawning

@@ -70,6 +70,7 @@ RulesClassExtension::RulesClassExtension(const RulesClass* this_ptr) :
     WeedPipIndex(1),
     MaxFreeRefineryDistanceBias(16),
     IsRecheckPrerequisites(false),
+    IsHelipadRepair(true),
     IsMultiMCV(false),
     AINavalYardAdjacency(20),
     IsAIRepairBaseNodes(false),
@@ -261,6 +262,7 @@ void RulesClassExtension::Object_CRC(CRCEngine &crc) const
     crc(IceStrength);
     crc(MaxFreeRefineryDistanceBias);
     crc(IsRecheckPrerequisites);
+    crc(IsHelipadRepair);
     crc(IsMultiMCV);
     crc(AINavalYardAdjacency);
     crc(IsAIRepairBaseNodes);
@@ -702,6 +704,7 @@ bool RulesClassExtension::General(CCINIClass &ini)
 
     MaxFreeRefineryDistanceBias = ini.Get_Int(GENERAL, "MaxFreeRefineryDistanceBias", MaxFreeRefineryDistanceBias);
     IsRecheckPrerequisites = ini.Get_Bool(GENERAL, "RecheckPrerequisites", IsRecheckPrerequisites);
+    IsHelipadRepair = ini.Get_Bool(GENERAL, "HelipadRepair", IsHelipadRepair);
     IsMultiMCV = ini.Get_Bool(GENERAL, "MultiMCV", IsMultiMCV);
     LowPowerPenaltyModifier = ini.Get_Float(GENERAL, "LowPowerPenaltyModifier", LowPowerPenaltyModifier);
     MultipleFactoryCap = ini.Get_Int(GENERAL, "MultipleFactoryCap", MultipleFactoryCap);

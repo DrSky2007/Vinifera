@@ -1096,6 +1096,16 @@ void BuildingClassExt::_Draw_Overlays(const Point2D& coord, const Rect& rect)
 int Get_Aircraft_Reload_Time(BuildingClass* building)
 {
     AircraftClass* radio = reinterpret_cast<AircraftClass*>(building->Contact_With_Whom());
+
+    /**
+     *  Helipad repair: if the aircraft has full ammo but is still damaged, use the
+     *  repair rate of service depots instead of the reload rate.
+     */
+    if (RuleExtension->IsHelipadRepair && building->Class->IsHelipad
+        && radio->Ammo >= radio->Class->MaxAmmo && radio->Strength < static_cast<int>(radio->Class->MaxStrength)) {
+        return Rule->URepairRate * TICKS_PER_MINUTE;
+    }
+
     AircraftTypeClassExtension* radio_class_ext = Extension::Fetch(radio->Class);
     return radio_class_ext->Get_ReloadRate() * TICKS_PER_MINUTE;
 }
