@@ -354,7 +354,7 @@ Vinifera modifies the vanilla "Deploy" keyboard command to work with air transpo
 
 ### `[ ]` Cheat: Instant Build
 
-- Toggles instant building of units and structures for the player. Only works in single player games (campaign and skirmish).
+- Toggles instant building of units and structures for the player. Only works in single player games (campaign and skirmish). Objects are only completed instantly if the player can afford them right away.
 
 ### `[ ]` Attack Move
 

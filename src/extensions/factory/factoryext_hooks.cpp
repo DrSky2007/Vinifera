@@ -18,6 +18,7 @@
 #include "factoryext_init.h"
 #include "hooker.h"
 #include "house.h"
+#include "session.h"
 #include "houseext.h"
 #include "mouse.h"
 #include "rulesext.h"
@@ -169,20 +170,24 @@ void FactoryClassExt::_AI()
              *
              *  @author: CCHyper
              */
+            /*
+            **  If InstantBuild is toggled on, make sure the local player is a human house.
+            **  This is also available outside of developer mode (as a single player cheat),
+            **  but only if the player can afford the rest of the object right away.
+            */
+            if (Vinifera_Developer_InstantBuild
+                && Session.Players.Count() <= 1
+                && House->Is_Human_Player() && House == PlayerPtr
+                && (Vinifera_DeveloperMode || House->Available_Money() >= Balance)) {
+                Set_Stage(STEP_COUNT);
+            }
+
             if (Vinifera_DeveloperMode) {
                 /*
                 **  If AIInstantBuild is toggled on, make sure this is a non-human AI house.
                 */
                 if (Vinifera_Developer_AIInstantBuild
                     && !House->Is_Human_Player() && House != PlayerPtr) {
-                    Set_Stage(STEP_COUNT);
-                }
-
-                /*
-                **  If InstantBuild is toggled on, make sure the local player is a human house.
-                */
-                if (Vinifera_Developer_InstantBuild
-                    && House->Is_Human_Player() && House == PlayerPtr) {
                     Set_Stage(STEP_COUNT);
                 }
 

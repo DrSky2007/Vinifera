@@ -34,6 +34,16 @@ In `RULES.INI`:
 HelipadRepair=yes  ; boolean, should aircraft docked at a helipad also be repaired?
 ```
 
+### Queue Limit
+
+- The maximum number of objects that can be queued in a factory can now be set with a new key that overrides `[General]->MaximumQueuedObjects` (5 in the original rules). Defaults to 30.
+
+In `RULES.INI`:
+```ini
+[General]
+QueueLimit=30  ; integer, the maximum number of objects that can be queued in a factory.
+```
+
 ## Animations
 
 ### Additional Animation Spawning

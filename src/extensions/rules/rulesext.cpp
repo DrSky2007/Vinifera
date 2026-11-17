@@ -11,6 +11,8 @@
 
 #include "rulesext.h"
 
+#include <algorithm>
+
 #include "addon.h"
 #include "aircrafttypeext.h"
 #include "animtypeext.h"
@@ -71,6 +73,7 @@ RulesClassExtension::RulesClassExtension(const RulesClass* this_ptr) :
     MaxFreeRefineryDistanceBias(16),
     IsRecheckPrerequisites(false),
     IsHelipadRepair(true),
+    QueueLimit(30),
     IsMultiMCV(false),
     AINavalYardAdjacency(20),
     IsAIRepairBaseNodes(false),
@@ -263,6 +266,7 @@ void RulesClassExtension::Object_CRC(CRCEngine &crc) const
     crc(MaxFreeRefineryDistanceBias);
     crc(IsRecheckPrerequisites);
     crc(IsHelipadRepair);
+    crc(QueueLimit);
     crc(IsMultiMCV);
     crc(AINavalYardAdjacency);
     crc(IsAIRepairBaseNodes);
@@ -705,6 +709,12 @@ bool RulesClassExtension::General(CCINIClass &ini)
     MaxFreeRefineryDistanceBias = ini.Get_Int(GENERAL, "MaxFreeRefineryDistanceBias", MaxFreeRefineryDistanceBias);
     IsRecheckPrerequisites = ini.Get_Bool(GENERAL, "RecheckPrerequisites", IsRecheckPrerequisites);
     IsHelipadRepair = ini.Get_Bool(GENERAL, "HelipadRepair", IsHelipadRepair);
+
+    /**
+     *  Overrides the original queue limit (MaximumQueuedObjects, 5 in the original rules).
+     */
+    QueueLimit = std::max(1, ini.Get_Int(GENERAL, "QueueLimit", QueueLimit));
+    This()->MaximumQueuedObjects = QueueLimit;
     IsMultiMCV = ini.Get_Bool(GENERAL, "MultiMCV", IsMultiMCV);
     LowPowerPenaltyModifier = ini.Get_Float(GENERAL, "LowPowerPenaltyModifier", LowPowerPenaltyModifier);
     MultipleFactoryCap = ini.Get_Int(GENERAL, "MultipleFactoryCap", MultipleFactoryCap);

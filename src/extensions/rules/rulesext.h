@@ -115,6 +115,12 @@ public:
     bool IsHelipadRepair;
 
     /**
+     *  The maximum number of objects that can be queued in a factory.
+     *  Overrides [General]->MaximumQueuedObjects.
+     */
+    int QueueLimit;
+
+    /**
      *  Should the game assume there is more than one MCV (that factions don't share their MCV?)
      */
     bool IsMultiMCV;
